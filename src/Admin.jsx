@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
-import { ArrowLeft, Trash2, Plus, Package, UploadCloud, Database, Activity, ShieldCheck, Cpu, Lock, Key, Hash } from 'lucide-react';
+import { ArrowLeft, Trash2, Plus, Package, UploadCloud, Database, Activity, ShieldCheck, Cpu, Lock, Key, Hash, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Admin({ darkMode }) {
@@ -41,6 +41,26 @@ export default function Admin({ darkMode }) {
     if (error) console.error("Ошибка загрузки данных:", error);
     else setPresets(data);
   }
+
+  // --- НОВАЯ ФУНКЦИЯ: УСТАНОВКА ГЛАВНОГО СЛАЙДЕРА ---
+  const setAsDefault = async (id) => {
+    setLoading(true);
+    try {
+      // 1. Сбрасываем флаг "MAIN" у всех (просто ставим обычную версию)
+      await supabase.from('presets').update({ version: 'v12.0+' }).neq('id', 0);
+      
+      // 2. Устанавливаем метку "MAIN" выбранному пресету
+      const { error } = await supabase.from('presets').update({ version: 'MAIN' }).eq('id', id);
+      
+      if (error) throw error;
+      alert("Главный слайдер обновлен!");
+      fetchPresets();
+    } catch (err) {
+      alert("Ошибка: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const uploadFile = async (file, folder) => {
     if (!file) return null;
@@ -89,7 +109,6 @@ export default function Admin({ darkMode }) {
   const inputBg = darkMode ? 'bg-[#121212]' : 'bg-gray-100';
   const borderColor = darkMode ? 'border-white/10' : 'border-gray-200';
 
-  // Общий стиль для всех select-полей
   const selectStyle = {
     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FA0F00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
     backgroundRepeat: 'no-repeat',
@@ -246,6 +265,11 @@ export default function Admin({ darkMode }) {
                       <td className="p-8">
                         <div className="w-14 h-14 border border-white/10 overflow-hidden bg-black relative">
                           <img src={item.after_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                          {item.version === 'MAIN' && (
+                            <div className="absolute inset-0 bg-[#FA0F00]/20 flex items-center justify-center">
+                               <Star size={12} className="text-[#FA0F00] fill-[#FA0F00]" />
+                            </div>
+                          )}
                         </div>
                       </td>
                       <td className="p-8">
@@ -265,9 +289,18 @@ export default function Admin({ darkMode }) {
                         </div>
                       </td>
                       <td className="p-8 text-right">
-                        <button onClick={() => handleDelete(item.id)} className="p-3 bg-white/5 text-gray-500 hover:text-white hover:bg-red-600 transition-all rounded-sm shadow-inner">
-                          <Trash2 size={16} />
-                        </button>
+                        <div className="flex gap-2 justify-end">
+                          <button 
+                            onClick={() => setAsDefault(item.id)}
+                            title="Сделать главным"
+                            className={`p-3 transition-all rounded-sm shadow-inner ${item.version === 'MAIN' ? 'bg-[#FA0F00] text-white' : 'bg-white/5 text-gray-500 hover:text-[#FA0F00]'}`}
+                          >
+                            <Star size={16} className={item.version === 'MAIN' ? 'fill-white' : ''} />
+                          </button>
+                          <button onClick={() => handleDelete(item.id)} className="p-3 bg-white/5 text-gray-500 hover:text-white hover:bg-red-600 transition-all rounded-sm shadow-inner">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
