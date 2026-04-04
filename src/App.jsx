@@ -14,13 +14,13 @@ const GlobalLoader = () => (
   <div className="fixed inset-0 z-[300] bg-[#050505] flex items-center justify-center">
     <div className="flex flex-col items-center gap-4 w-full max-w-[200px]">
       <span className="text-[9px] font-black uppercase tracking-[0.5em] text-[#FA0F00] opacity-80 animate-pulse">
-        Loading Assets
+        Загрузка пресетов
       </span>
       <div className="w-full h-[1px] bg-white/5 relative overflow-hidden">
         <div className="absolute inset-0 bg-[#FA0F00] origin-left animate-[loading-bar_1.5s_infinite_ease-in-out]"></div>
       </div>
       <span className="text-[8px] font-mono opacity-20 uppercase tracking-widest">
-        System.Init
+        Инициализация
       </span>
     </div>
   </div>
