@@ -9,6 +9,22 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import Admin from './Admin'; 
 
+// --- КОМПОНЕНТ: ПОЛНОЭКРАННЫЙ ПРЕЛОАДЕР ---
+const GlobalLoader = () => (
+  <div className="fixed inset-0 z-[300] bg-[#050505] flex flex-col items-center justify-center gap-6">
+    <div className="relative">
+      <div className="bg-[#FA0F00] text-white w-16 h-16 flex items-center justify-center font-black text-3xl shadow-[0_0_50px_rgba(250,15,0,0.3)] animate-pulse">L</div>
+      <div className="absolute -inset-4 border-2 border-[#FA0F00]/20 border-t-[#FA0F00] rounded-full animate-spin"></div>
+    </div>
+    <div className="flex flex-col items-center gap-2">
+      <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#FA0F00] animate-pulse">Инициализация системы</span>
+      <div className="w-48 h-[2px] bg-white/5 overflow-hidden">
+        <div className="w-full h-full bg-[#FA0F00] origin-left animate-[loading-bar_1.5s_infinite_ease-in-out]"></div>
+      </div>
+    </div>
+  </div>
+);
+
 // --- УВЕДОМЛЕНИЯ ---
 const Toast = ({ message }) => (
   <div className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[200] animate-in slide-in-from-right-10 duration-500">
@@ -199,7 +215,10 @@ export default function App() {
       setLoading(true);
       const { data: presets, error } = await supabase.from('presets').select('*').order('id', { ascending: false });
       if (!error) setData(presets);
-    } finally { setTimeout(() => setLoading(false), 800); }
+    } finally { 
+      // Небольшая задержка для плавности прелоадера
+      setTimeout(() => setLoading(false), 1500); 
+    }
   }
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
@@ -211,6 +230,10 @@ export default function App() {
 
   return (
     <div className={`min-h-screen transition-colors ${darkMode ? 'bg-[#050505] text-[#E0E0E0]' : 'bg-[#F9F9F9] text-[#1A1A1A]'}`}>
+      
+      {/* ПРЕЛОАДЕР ПРИ ПЕРВОМ ЗАХОДЕ */}
+      {loading && location.pathname === '/' && <GlobalLoader />}
+
       {toast && <Toast message={toast} />}
 
       {/* НАВИГАЦИЯ */}
