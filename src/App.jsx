@@ -206,6 +206,9 @@ export default function App() {
   useEffect(() => { localStorage.setItem('purchased_presets', JSON.stringify(purchasedIds)); }, [purchasedIds]);
   useEffect(() => { setMenuOpen(false); window.scrollTo(0,0); }, [location]);
 
+  // Находим "Главный" пресет через метку 'MAIN' в поле version
+  const mainPreset = data.find(p => p.version === 'MAIN') || data[0];
+
   return (
     <div className={`min-h-screen transition-colors ${darkMode ? 'bg-[#050505] text-[#E0E0E0]' : 'bg-[#F9F9F9] text-[#1A1A1A]'}`}>
       {toast && <Toast message={toast} />}
@@ -266,7 +269,11 @@ export default function App() {
                 </div>
                 <div className="w-full xl:w-[50%] group">
                   <div className="aspect-square bg-white/5 border border-white/5 shadow-2xl relative overflow-hidden">
-                    <ReactCompareSlider itemOne={<ReactCompareSliderImage src={data[0]?.before_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070"} />} itemTwo={<ReactCompareSliderImage src={data[0]?.after_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&sat=-100"} />} className="h-full w-full object-cover transition-all duration-1000" />
+                    <ReactCompareSlider 
+                      itemOne={<ReactCompareSliderImage src={mainPreset?.before_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070"} />} 
+                      itemTwo={<ReactCompareSliderImage src={mainPreset?.after_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&sat=-100"} />} 
+                      className="h-full w-full object-cover transition-all duration-1000" 
+                    />
                   </div>
                 </div>
               </div>
