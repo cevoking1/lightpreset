@@ -85,7 +85,7 @@ function Shop({ data, loading, darkMode, setPayModal, setCurrentProduct, purchas
                 <ReactCompareSlider 
                   itemOne={<ReactCompareSliderImage src={item.before_url} />} 
                   itemTwo={<ReactCompareSliderImage src={item.after_url} />} 
-                  className="h-full w-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700" 
+                  className="h-full w-full object-cover transition-all duration-700" 
                 />
               </div>
               <div className="flex-1 flex flex-col justify-center text-center xl:text-left w-full">
@@ -266,7 +266,7 @@ export default function App() {
                 </div>
                 <div className="w-full xl:w-[50%] group">
                   <div className="aspect-square bg-white/5 border border-white/5 shadow-2xl relative overflow-hidden">
-                    <ReactCompareSlider itemOne={<ReactCompareSliderImage src={data[0]?.before_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070"} />} itemTwo={<ReactCompareSliderImage src={data[0]?.after_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&sat=-100"} />} className="h-full w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" />
+                    <ReactCompareSlider itemOne={<ReactCompareSliderImage src={data[0]?.before_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070"} />} itemTwo={<ReactCompareSliderImage src={data[0]?.after_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&sat=-100"} />} className="h-full w-full object-cover transition-all duration-1000" />
                   </div>
                 </div>
               </div>
