@@ -4,5 +4,52 @@
 
 body {
   margin: 0;
-  background-color: white;
+  /* Убираем жесткий белый фон, чтобы при загрузке не было вспышек */
+  background-color: #050505; 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Анимация для минималистичного прелоадера */
+@keyframes loading-bar {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  51% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+
+/* Вспомогательный класс для анимации (используется в App.jsx) */
+.animate-loading-bar {
+  animation: loading-bar 1.5s infinite cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Плавный скролл для всего сайта */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Кастомный скроллбар в стиле темной темы */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #FA0F00;
+  border-radius: 10px;
 }
