@@ -38,21 +38,25 @@ const SkeletonCard = () => (
   <div className="w-full h-64 bg-[var(--bg-secondary)] animate-pulse rounded-sm mb-4 border border-[var(--border)]"></div>
 );
 
-// --- КОМПОНЕНТ: FAQ КАРТОЧКА ---
+// --- КОМПОНЕНТ: FAQ КАРТОЧКА (ИСПРАВЛЕНА ПЛАВНОСТЬ) ---
 const FAQItem = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="border border-[var(--border)] bg-[var(--bg-secondary)] rounded-sm overflow-hidden transition-all duration-300 hover:border-[var(--accent)]/30">
+    <div className="border border-[var(--border)] bg-[var(--bg-secondary)] rounded-sm overflow-hidden h-fit transition-all duration-300">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-6 flex justify-between items-center text-left transition-colors group"
+        className="w-full p-6 flex justify-between items-center text-left group"
       >
         <span className="text-[9px] font-[1000] uppercase tracking-widest pr-4 leading-tight">{question}</span>
         <ChevronDown size={14} className={`flex-shrink-0 transition-transform duration-500 ${isOpen ? 'rotate-180 text-[var(--accent)]' : 'opacity-20'}`} />
       </button>
-      <div className={`overflow-hidden transition-all duration-500 ${isOpen ? 'max-h-[500px]' : 'max-h-0'}`}>
-        <div className="p-6 pt-0 border-t border-[var(--border)] text-[var(--text-main)]">
-           <p className="text-[10px] opacity-60 leading-relaxed uppercase tracking-wider font-medium whitespace-pre-line">{answer}</p>
+      <div 
+        className={`grid transition-all duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+      >
+        <div className="overflow-hidden">
+          <div className="p-6 pt-0 border-t border-[var(--border)] text-[var(--text-main)]">
+             <p className="text-[10px] opacity-60 leading-relaxed uppercase tracking-wider font-medium whitespace-pre-line">{answer}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -240,8 +244,8 @@ export default function App() {
 
       {/* НАВИГАЦИОННАЯ ПАНЕЛЬ */}
       <nav className="sticky top-0 z-[100] border-b border-[var(--border)] bg-[var(--bg-primary)]/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 md:py-6 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 md:py-6 flex justify-between items-center relative">
+          <Link to="/" className="flex items-center gap-2 group flex-shrink-0 z-10">
             <div className="bg-[var(--accent)] text-white w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-black text-lg transition-transform group-hover:-rotate-6">L</div>
             <span className="font-black text-xl md:text-2xl tracking-tighter uppercase text-[var(--accent)]">Presets.</span>
           </Link>
@@ -253,7 +257,7 @@ export default function App() {
             <Link to="/guide" className="hover:text-[var(--accent)] transition-colors">Инструкция</Link>
           </div>
 
-          <div className="flex gap-4 md:gap-8 items-center flex-shrink-0">
+          <div className="flex gap-4 md:gap-8 items-center flex-shrink-0 z-10">
             <button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-full hover:bg-gray-500/10 transition-all text-[var(--accent)]">
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -304,7 +308,7 @@ export default function App() {
                 ))}
               </div>
 
-              {/* СЕКЦИЯ: FAQ (В 2 КОЛОННЫ ПО 3 ШТУКИ) */}
+              {/* СЕКЦИЯ: FAQ (В 2 КОЛОННЫ ПО 3 ШТУКИ, НЕЗАВИСИМЫЕ) */}
               <div className="py-20 md:py-40 border-t border-[var(--border)] max-w-6xl mx-auto">
                 <div className="mb-16 text-center">
                   <h3 className="text-4xl md:text-6xl font-[1000] uppercase tracking-tighter italic leading-none mb-6 text-[var(--text-main)]">FAQ.</h3>
@@ -313,31 +317,35 @@ export default function App() {
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FAQItem 
-                    question="В каких форматах я получу пресеты?" 
-                    answer="Каждый пак содержит файлы двух форматов: .XMP (ПК) и .DNG (Mobile)." 
-                  />
-                  <FAQItem 
-                    question="Как происходит покупка и получение?" 
-                    answer="После оплаты ID пресета записывается в ваш архив, и кнопка меняется на 'Скачать'." 
-                  />
-                  <FAQItem 
-                    question="Нужна ли подписка на Lightroom?" 
-                    answer="Нет, пресеты работают даже в бесплатной мобильной версии приложения." 
-                  />
-                  <FAQItem 
-                    question="Срок доступа к материалам?" 
-                    answer="Доступ предоставляется навсегда через локальное хранилище Библиотеки." 
-                  />
-                  <FAQItem 
-                    question="Безопасность платежных данных" 
-                    answer="Все платежи проходят через зашифрованный шлюз банка-эквайера." 
-                  />
-                  <FAQItem 
-                    question="Как установить пресеты на телефон?" 
-                    answer="Скачайте .DNG, откройте в Lightroom и выберите 'Создать стиль' (Create Preset)." 
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                  <div className="space-y-6">
+                    <FAQItem 
+                      question="В каких форматах я получу пресеты?" 
+                      answer="Каждый пак содержит файлы двух форматов: .XMP (ПК) и .DNG (Mobile)." 
+                    />
+                    <FAQItem 
+                      question="Как происходит покупка и получение?" 
+                      answer="После оплаты ID пресета записывается в ваш архив, и кнопка меняется на 'Скачать'." 
+                    />
+                    <FAQItem 
+                      question="Нужна ли подписка на Lightroom?" 
+                      answer="Нет, пресеты работают даже в бесплатной мобильной версии приложения." 
+                    />
+                  </div>
+                  <div className="space-y-6">
+                    <FAQItem 
+                      question="Срок доступа к материалам?" 
+                      answer="Доступ предоставляется навсегда через локальное хранилище Библиотеки." 
+                    />
+                    <FAQItem 
+                      question="Безопасность платежных данных" 
+                      answer="Все платежи проходят через зашифрованный шлюз банка-эквайера." 
+                    />
+                    <FAQItem 
+                      question="Как установить пресеты на телефон?" 
+                      answer="Скачайте .DNG, откройте в Lightroom и выберите 'Создать стиль' (Create Preset)." 
+                    />
+                  </div>
                 </div>
               </div>
             </>
