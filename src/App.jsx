@@ -38,32 +38,21 @@ const SkeletonCard = () => (
   <div className="w-full h-64 bg-[var(--bg-secondary)] animate-pulse rounded-sm mb-4 border border-[var(--border)]"></div>
 );
 
-// --- КОМПОНЕНТ: FAQ КАРТОЧКА (ИСПРАВЛЕНА ПЛАВНОСТЬ) ---
-const FAQItem = ({ question, answer }) => {
-  const [isOpen, setIsOpen] = useState(false);
+// --- КОМПОНЕНТ: FAQ КАРТОЧКА (ВСЕГДА ОТКРЫТА) ---
+const FAQStaticItem = ({ question, answer }) => {
   return (
     <div className="border border-[var(--border)] bg-[var(--bg-secondary)] rounded-sm overflow-hidden h-fit transition-all duration-300">
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-6 flex justify-between items-center text-left group"
-      >
-        <span className="text-[9px] font-[1000] uppercase tracking-widest pr-4 leading-tight">{question}</span>
-        <ChevronDown size={14} className={`flex-shrink-0 transition-transform duration-500 ${isOpen ? 'rotate-180 text-[var(--accent)]' : 'opacity-20'}`} />
-      </button>
-      <div 
-        className={`grid transition-all duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
-      >
-        <div className="overflow-hidden">
-          <div className="p-6 pt-0 border-t border-[var(--border)] text-[var(--text-main)]">
-             <p className="text-[10px] opacity-60 leading-relaxed uppercase tracking-wider font-medium whitespace-pre-line">{answer}</p>
-          </div>
+      <div className="p-6">
+        <span className="text-[9px] font-[1000] uppercase tracking-widest text-[var(--accent)] leading-tight block mb-4">{question}</span>
+        <div className="pt-4 border-t border-[var(--border)] text-[var(--text-main)]">
+           <p className="text-[10px] opacity-60 leading-relaxed uppercase tracking-wider font-medium whitespace-pre-line">{answer}</p>
         </div>
       </div>
     </div>
   );
 };
 
-// --- СТРАНИЦА: МАГАЗИН ---
+// --- СТРАНИЦА: МАГАЗИН (КАТАЛОГ) ---
 function Shop({ data, loading, setPayModal, setCurrentProduct, purchasedIds }) {
   const [activeFilter, setActiveFilter] = useState('Все');
   const [searchQuery, setSearchQuery] = useState('');
@@ -250,14 +239,13 @@ export default function App() {
             <span className="font-black text-xl md:text-2xl tracking-tighter uppercase text-[var(--accent)]">Presets.</span>
           </Link>
           
-          {/* МЕНЮ ПО ЦЕНТРУ */}
-          <div className="hidden xl:flex items-center gap-12 text-[10px] font-black uppercase tracking-[0.3em] opacity-40 absolute left-1/2 -translate-x-1/2">
+          <div className="hidden xl:flex items-center gap-12 text-[10px] font-black uppercase tracking-[0.3em] opacity-40 absolute left-1/2 -translate-x-1/2 text-center w-fit">
             <Link to="/catalog" className="hover:text-[var(--accent)] transition-colors">Магазин</Link>
             <Link to="/profile" className="hover:text-[var(--accent)] transition-colors">Библиотека</Link>
             <Link to="/guide" className="hover:text-[var(--accent)] transition-colors">Инструкция</Link>
           </div>
 
-          <div className="flex gap-4 md:gap-8 items-center flex-shrink-0 z-10">
+          <div className="flex gap-4 md:gap-8 items-center flex-shrink-0 z-10 text-[var(--text-main)]">
             <button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-full hover:bg-gray-500/10 transition-all text-[var(--accent)]">
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -276,7 +264,7 @@ export default function App() {
             <>
               <div className="py-12 md:py-32 flex flex-col xl:flex-row items-center justify-between gap-12 xl:-mt-10 max-w-6xl mx-auto">
                 <div className="w-full xl:w-[48%] space-y-8 md:space-y-12 text-center xl:text-left">
-                  <h1 className="text-5xl md:text-8xl xl:text-[9.5rem] font-[1000] uppercase leading-[0.8] tracking-tight">ТВОЙ <br/><span className="text-[var(--accent)]">СТИЛЬ.</span></h1>
+                  <h1 className="text-5xl md:text-8xl xl:text-[9.5rem] font-[1000] uppercase leading-[0.8] tracking-tight text-[var(--text-main)]">ТВОЙ <br/><span className="text-[var(--accent)]">СТИЛЬ.</span></h1>
                   <p className="max-w-md opacity-60 text-sm md:text-base font-medium leading-relaxed uppercase tracking-wider mx-auto xl:mx-0">Создавайте профессиональный контент в один клик. Все пресеты разработаны для Adobe Lightroom.</p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center xl:justify-start font-sans">
                     <Link to="/catalog" className="bg-[var(--accent)] text-white px-10 md:px-14 py-5 md:py-6 font-black uppercase text-[10px] tracking-widest shadow-2xl active:scale-95 transition-all text-center">Каталог стилей</Link>
@@ -308,7 +296,7 @@ export default function App() {
                 ))}
               </div>
 
-              {/* СЕКЦИЯ: FAQ (В 2 КОЛОННЫ ПО 3 ШТУКИ, НЕЗАВИСИМЫЕ) */}
+              {/* СЕКЦИЯ: FAQ (ОТКРЫТЫЙ СТИЛЬ) */}
               <div className="py-20 md:py-40 border-t border-[var(--border)] max-w-6xl mx-auto">
                 <div className="mb-16 text-center">
                   <h3 className="text-4xl md:text-6xl font-[1000] uppercase tracking-tighter italic leading-none mb-6 text-[var(--text-main)]">FAQ.</h3>
@@ -319,29 +307,29 @@ export default function App() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                   <div className="space-y-6">
-                    <FAQItem 
+                    <FAQStaticItem 
                       question="В каких форматах я получу пресеты?" 
                       answer="Каждый пак содержит файлы двух форматов: .XMP (ПК) и .DNG (Mobile)." 
                     />
-                    <FAQItem 
+                    <FAQStaticItem 
                       question="Как происходит покупка и получение?" 
                       answer="После оплаты ID пресета записывается в ваш архив, и кнопка меняется на 'Скачать'." 
                     />
-                    <FAQItem 
+                    <FAQStaticItem 
                       question="Нужна ли подписка на Lightroom?" 
                       answer="Нет, пресеты работают даже в бесплатной мобильной версии приложения." 
                     />
                   </div>
                   <div className="space-y-6">
-                    <FAQItem 
+                    <FAQStaticItem 
                       question="Срок доступа к материалам?" 
                       answer="Доступ предоставляется навсегда через локальное хранилище Библиотеки." 
                     />
-                    <FAQItem 
+                    <FAQStaticItem 
                       question="Безопасность платежных данных" 
                       answer="Все платежи проходят через зашифрованный шлюз банка-эквайера." 
                     />
-                    <FAQItem 
+                    <FAQStaticItem 
                       question="Как установить пресеты на телефон?" 
                       answer="Скачайте .DNG, откройте в Lightroom и выберите 'Создать стиль' (Create Preset)." 
                     />
@@ -419,7 +407,7 @@ export default function App() {
 
       {/* ПЛАТЕЖНОЕ ОКНО */}
       {payModal && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-[150] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-[150] flex items-center justify-center p-4 text-[var(--text-main)]">
           <div className="bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-main)] w-full max-w-lg p-8 md:p-16 shadow-2xl relative animate-in zoom-in-95 duration-300 font-sans">
             {!isPaying && <button onClick={() => setPayModal(false)} className="absolute top-6 right-6 opacity-30 hover:opacity-100 transition-opacity font-bold text-2xl text-[var(--text-main)]">✕</button>}
             <div className="space-y-8">
