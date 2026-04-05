@@ -2,54 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Определение системных цветов */
+:root {
+  /* Светлая тема */
+  --bg-primary: #F5F5F7;    /* Мягкий светлый (как у Apple) */
+  --bg-secondary: #FFFFFF;  /* Чистый белый для карточек */
+  --text-main: #1D1D1F;     /* Глубокий серый (вместо черного) */
+  --accent: #FA0F00;        /* Твой фирменный красный */
+  --border: rgba(0,0,0,0.05);
+}
+
+[data-theme='dark'] {
+  /* Темная тема (Deep Charcoal) */
+  --bg-primary: #0F0F0F;    /* Тот самый мягкий черный */
+  --bg-secondary: #161616;  /* Чуть светлее для блоков */
+  --text-main: #F5F5F7;     /* Чистый светлый текст */
+  --accent: #FA0F00;
+  --border: rgba(255,255,255,0.05);
+}
+
 body {
   margin: 0;
-  /* Убираем жесткий белый фон, чтобы при загрузке не было вспышек */
-  background-color: #0F0F0F; 
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Анимация для минималистичного прелоадера */
 @keyframes loading-bar {
-  0% {
-    transform: scaleX(0);
-    transform-origin: left;
-  }
-  50% {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-  51% {
-    transform: scaleX(1);
-    transform-origin: right;
-  }
-  100% {
-    transform: scaleX(0);
-    transform-origin: right;
-  }
+  0% { transform: scaleX(0); transform-origin: left; }
+  50% { transform: scaleX(1); transform-origin: left; }
+  51% { transform: scaleX(1); transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
 }
 
-/* Вспомогательный класс для анимации (используется в App.jsx) */
 .animate-loading-bar {
   animation: loading-bar 1.5s infinite cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-/* Плавный скролл для всего сайта */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Кастомный скроллбар в стиле темной темы */
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-::-webkit-scrollbar-track {
-  background: #050505;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #FA0F00;
-  border-radius: 10px;
-}
+/* Кастомный скроллбар */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
