@@ -42,12 +42,11 @@ export default function Admin({ darkMode }) {
     else setPresets(data);
   }
 
-  // --- ИСПРАВЛЕННАЯ ФУНКЦИЯ: УСТАНОВКА ГЛАВНОГО СЛАЙДЕРА ---
+  // --- ОБНОВЛЕННАЯ ФУНКЦИЯ: УСТАНОВКА ГЛАВНОГО СЛАЙДЕРА ---
   const setAsDefault = async (id) => {
     setLoading(true);
     try {
-      // 1. Сначала находим все пресеты, у которых версия "MAIN" и сбрасываем их
-      // Это надежнее, чем массовое обновление через neq('id', 0)
+      // 1. Сбрасываем MAIN у всех, кто его имеет
       await supabase
         .from('presets')
         .update({ version: 'v12.0+' })
@@ -61,10 +60,10 @@ export default function Admin({ darkMode }) {
       
       if (error) throw error;
       
-      alert("Главный слайдер успешно обновлен!");
-      await fetchPresets(); // Ждем обновления списка
+      alert("Система: Главный актив синхронизирован.");
+      await fetchPresets(); 
     } catch (err) {
-      alert("Ошибка при обновлении: " + err.message);
+      alert("Ошибка: " + err.message);
     } finally {
       setLoading(false);
     }
