@@ -42,18 +42,16 @@ const SkeletonCard = () => (
 const FAQItem = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="border border-[var(--border)] bg-[var(--bg-secondary)] rounded-sm overflow-hidden transition-all duration-300 hover:border-[var(--accent)]/30">
+    <div className="border-b border-[var(--border)]">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-6 flex justify-between items-center text-left transition-colors group"
+        className="w-full py-6 flex justify-between items-center text-left hover:text-[var(--accent)] transition-colors group"
       >
-        <span className="text-[10px] font-[1000] uppercase tracking-widest pr-4 leading-tight">{question}</span>
-        <ChevronDown size={14} className={`flex-shrink-0 transition-transform duration-500 ${isOpen ? 'rotate-180 text-[var(--accent)]' : 'opacity-20'}`} />
+        <span className="text-[10px] md:text-xs font-[1000] uppercase tracking-[0.2em] pr-4">{question}</span>
+        <ChevronDown size={16} className={`transition-transform duration-500 ${isOpen ? 'rotate-180 text-[var(--accent)]' : 'opacity-20'}`} />
       </button>
-      <div className={`overflow-hidden transition-all duration-500 ${isOpen ? 'max-h-[500px]' : 'max-h-0'}`}>
-        <div className="p-6 pt-0 border-t border-[var(--border)]">
-           <p className="text-[11px] opacity-60 leading-relaxed uppercase tracking-wider font-medium whitespace-pre-line">{answer}</p>
-        </div>
+      <div className={`overflow-hidden transition-all duration-500 ${isOpen ? 'max-h-[500px] pb-8' : 'max-h-0'}`}>
+        <p className="text-[11px] md:text-sm opacity-60 leading-relaxed uppercase tracking-wider font-medium whitespace-pre-line">{answer}</p>
       </div>
     </div>
   );
@@ -271,6 +269,7 @@ export default function App() {
             <>
               <div className="py-12 md:py-32 flex flex-col xl:flex-row items-center justify-between gap-12 xl:-mt-10 max-w-6xl mx-auto">
                 <div className="w-full xl:w-[48%] space-y-8 md:space-y-12 text-center xl:text-left">
+                  {/* ИЗМЕНЕНИЕ: МЯГКИЙ БЭДЖ */}
                   <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-[var(--accent)]/20 bg-[var(--accent)]/5 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-[var(--accent)]">Цифровые решения 2026</div>
                   <h1 className="text-5xl md:text-8xl xl:text-[9.5rem] font-[1000] uppercase leading-[0.8] tracking-tight">ТВОЙ <br/><span className="text-[var(--accent)]">СТИЛЬ.</span></h1>
                   <p className="max-w-md opacity-60 text-sm md:text-base font-medium leading-relaxed uppercase tracking-wider mx-auto xl:mx-0">Создавайте профессиональный контент в один клик. Все пресеты разработаны для Adobe Lightroom 2026 года.</p>
@@ -304,16 +303,13 @@ export default function App() {
                 ))}
               </div>
 
-              {/* СЕКЦИЯ: ВОПРОСЫ И ОТВЕТЫ (FAQ) */}
+              {/* ИЗМЕНЕНИЕ: ПОДРОБНОЕ ИНФО */}
               <div className="py-20 md:py-40 border-t border-[var(--border)] max-w-6xl mx-auto">
-                <div className="mb-16 text-center">
-                  <h3 className="text-4xl md:text-6xl font-[1000] uppercase tracking-tighter italic leading-none mb-6 text-[var(--text-main)]">Вопросы и ответы.</h3>
-                  <p className="max-w-2xl mx-auto text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-[var(--accent)] opacity-80 leading-relaxed">
-                    Все, что вам нужно знать о покупке, форматах и использовании цифровых активов LightPresets System.
-                  </p>
+                <div className="mb-12 text-center xl:text-left">
+                  <h3 className="text-4xl md:text-5xl font-[1000] uppercase tracking-tighter italic leading-none mb-4">Инфо.</h3>
+                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--accent)]">База знаний и частые вопросы</p>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="max-w-4xl space-y-2">
                   <FAQItem 
                     question="В каких форматах я получу пресеты?" 
                     answer="Каждый пак содержит файлы двух форматов:\n1. .XMP — для компьютерной версии Lightroom и Camera Raw.\n2. .DNG — для мобильной версии Lightroom (iOS и Android)." 
@@ -334,10 +330,6 @@ export default function App() {
                     question="Безопасность платежных данных" 
                     answer="Мы не храним данные ваших карт на наших серверах. Все платежи проходят через зашифрованный шлюз банка-эквайера, что гарантирует 100% безопасность ваших средств." 
                   />
-                  <FAQItem 
-                    question="Как установить пресеты на телефон?" 
-                    answer="1. Скачайте файл .DNG из Библиотеки.\n2. Откройте его в приложении Lightroom Mobile.\n3. Нажмите на три точки в углу и выберите 'Создать стиль' (Create Preset).\n4. Теперь стиль доступен для любого вашего фото." 
-                  />
                 </div>
               </div>
             </>
@@ -349,7 +341,7 @@ export default function App() {
         </Routes>
       </div>
 
-      {/* ФУТЕР */}
+      {/* ИЗМЕНЕНИЕ: СИММЕТРИЧНЫЙ ФУТЕР */}
       <footer className="mt-20 border-t border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-main)]">
         <div className="max-w-7xl mx-auto px-8 py-16 grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="space-y-6 flex flex-col items-center md:items-start text-center md:text-left">
@@ -413,19 +405,19 @@ export default function App() {
       {payModal && (
         <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-[150] flex items-center justify-center p-4">
           <div className="bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-main)] w-full max-w-lg p-8 md:p-16 shadow-2xl relative animate-in zoom-in-95 duration-300 font-sans">
-            {!isPaying && <button onClick={() => setPayModal(false)} className="absolute top-6 right-6 opacity-30 hover:opacity-100 transition-opacity font-bold text-2xl text-[var(--text-main)]">✕</button>}
+            {!isPaying && <button onClick={() => setPayModal(false)} className="absolute top-6 right-6 opacity-30 hover:opacity-100 transition-opacity font-bold text-2xl">✕</button>}
             <div className="space-y-8">
               <div className="text-center space-y-4">
                 <h2 className="text-[10px] font-[1000] uppercase tracking-[0.5em] text-[var(--accent)] flex items-center justify-center gap-3">
                   {isPaying ? <Activity size={16} className="animate-spin" /> : <Lock size={16}/>} {isPaying ? "Связь с банком..." : "Оплата"}
                 </h2>
-                <p className="text-[10px] opacity-30 uppercase font-black italic text-[var(--text-main)]">{currentProduct?.name}</p>
+                <p className="text-[10px] opacity-30 uppercase font-black italic">{currentProduct?.name}</p>
               </div>
               <div className={`space-y-8 transition-opacity duration-500 ${isPaying ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
-                <input type="text" maxLength="19" placeholder="НОМЕР КАРТЫ" className="w-full bg-transparent border-b border-[var(--border)] py-4 outline-none font-mono text-base md:text-lg focus:border-[var(--accent)] text-[var(--text-main)]" onChange={(e) => {e.target.value = e.target.value.replace(/\W/gi, '').replace(/(.{4})/g, '$1 ').trim();}} />
+                <input type="text" maxLength="19" placeholder="НОМЕР КАРТЫ" className="w-full bg-transparent border-b border-[var(--border)] py-4 outline-none font-mono text-base md:text-lg focus:border-[var(--accent)]" onChange={(e) => {e.target.value = e.target.value.replace(/\W/gi, '').replace(/(.{4})/g, '$1 ').trim();}} />
                 <div className="grid grid-cols-2 gap-8">
-                  <input type="text" maxLength="5" placeholder="ММ / ГГ" className="bg-transparent border-b border-[var(--border)] py-4 outline-none text-sm focus:border-[var(--accent)] text-[var(--text-main)]" />
-                  <input type="password" maxLength="3" placeholder="CVC" className="bg-transparent border-b border-[var(--border)] py-4 outline-none text-sm focus:border-[var(--accent)] text-[var(--text-main)]" />
+                  <input type="text" maxLength="5" placeholder="ММ / ГГ" className="bg-transparent border-b border-[var(--border)] py-4 outline-none text-sm focus:border-[var(--accent)]" />
+                  <input type="password" maxLength="3" placeholder="CVC" className="bg-transparent border-b border-[var(--border)] py-4 outline-none text-sm focus:border-[var(--accent)]" />
                 </div>
               </div>
               <button disabled={isPaying} onClick={() => { setIsPaying(true); setTimeout(() => { setPurchasedIds([...purchasedIds, currentProduct.id]); setPayModal(false); setIsPaying(false); showToast("Пакет успешно добавлен в архив"); }, 2500); }} className="w-full py-5 bg-[var(--accent)] text-white font-[1000] uppercase tracking-[0.4em] text-[10px] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-4">
