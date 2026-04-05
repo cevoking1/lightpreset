@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Download, Lock, Moon, Sun, Search, Menu, X, CheckCircle, 
-  Monitor, Smartphone, MessageSquare, ChevronDown, Activity 
+  Monitor, Smartphone, MessageSquare, ChevronDown, Activity, 
+  Camera, ExternalLink 
 } from 'lucide-react';
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
@@ -88,7 +89,7 @@ function Shop({ data, loading, setPayModal, setCurrentProduct, purchasedIds }) {
               onChange={(e) => setSearchQuery(e.target.value)} 
             />
           </div>
-          <div className="flex bg-[var(--bg-secondary)] p-1 border border-[var(--border)]">
+          <div className="flex bg-[var(--bg-secondary)] p-1 border border-[var(--border)] overflow-x-auto no-scrollbar">
             {['Все', 'ПК', 'Мобильные'].map(cat => (
               <button 
                 key={cat} 
@@ -289,7 +290,7 @@ export default function App() {
                   <p className="max-w-md opacity-60 text-sm md:text-base font-medium leading-relaxed uppercase tracking-wider mx-auto xl:mx-0">Профессиональная цветокоррекция фотографий в один клик. Автоматизируй свой рабочий процесс.</p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center xl:justify-start font-sans">
                     <Link to="/catalog" className="bg-[var(--accent)] text-white px-10 md:px-14 py-5 md:py-6 font-black uppercase text-[10px] tracking-widest shadow-2xl active:scale-95 transition-all text-center">Открыть магазин</Link>
-                    <Link to="/guide" className="bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-main)] px-10 md:px-14 py-5 md:py-6 font-black uppercase text-[10px] tracking-widest hover:bg-[var(--text-main)] hover:text-[var(--bg-primary)] transition-all text-center">Инструкция</Link>
+                    <Link to="/guide" className="bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-main)] px-10 md:px-14 py-5 md:py-6 font-black uppercase text-[10px] tracking-widest hover:bg-[var(--text-main)] hover:text-[var(--bg-primary)] transition-all text-center text-nowrap">Узнать больше</Link>
                   </div>
                 </div>
                 <div className="w-full xl:w-[50%]">
@@ -325,7 +326,7 @@ export default function App() {
                 <div className="max-w-3xl">
                   <FAQItem question="Как я получу файлы после покупки?" answer="Сразу после подтверждения транзакции в разделе 'Библиотека' появится кнопка скачивания." />
                   <FAQItem question="С какими версиями Lightroom совместимы пресеты?" answer="Пресеты поставляются в форматах .XMP для ПК и .DNG для мобильной версии Lightroom." />
-                  <FAQItem question="Безопасно ли проводить оплату?" answer="Мы используем защищенное соединение. Платежные данные обрабатываются банком-эквайером." />
+                  <FAQItem question="Безопасна ли проводить оплату?" answer="Мы используем защищенное соединение. Платежные данные обрабатываются банком-эквайером." />
                 </div>
               </div>
             </>
@@ -342,37 +343,55 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6 md:px-10 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-12 text-[10px] font-black uppercase tracking-widest opacity-40 text-center sm:text-left">
           <div className="space-y-8">
             <div className="flex items-center justify-center sm:justify-start gap-3 text-[var(--accent)]">
-              <div className="bg-[var(--accent)] text-white w-8 h-8 flex items-center justify-center rounded-sm text-lg">L</div>
+              <div className="bg-[var(--accent)] text-white w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-sm text-lg">L</div>
               <span className="text-xl tracking-tighter font-black">Presets.</span>
             </div>
             <p className="normal-case font-bold italic leading-relaxed">Система автоматизации обработки контента.</p>
           </div>
           <div className="space-y-4">
-            <h4 className="text-[var(--accent)]">Навигация</h4>
+            <h4 className="text-[var(--accent)] font-bold">Навигация</h4>
             <ul className="space-y-2 opacity-70">
               <li><Link to="/catalog">Каталог</Link></li>
               <li><Link to="/profile">Библиотека</Link></li>
             </ul>
           </div>
           <div className="space-y-4">
-            <h4 className="text-[var(--accent)]">Ресурсы</h4>
+            <h4 className="text-[var(--accent)] font-bold">Ресурсы</h4>
             <ul className="space-y-2 opacity-70">
               <li><Link to="/guide">Инструкция</Link></li>
               <li>Служба поддержки</li>
             </ul>
           </div>
           <div className="space-y-4">
-             <h4 className="text-[var(--accent)]">Сети</h4>
-             <div className="flex gap-6 justify-center sm:justify-start"><Camera size={18} /><ExternalLink size={18} /></div>
+             <h4 className="text-[var(--accent)] font-bold">Сети</h4>
+             <div className="flex gap-6 justify-center sm:justify-start">
+               <Camera size={18} />
+               <ExternalLink size={18} />
+             </div>
           </div>
         </div>
       </footer>
+
+      {/* МОБИЛЬНОЕ МЕНЮ */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-[120] p-8 flex flex-col bg-[var(--bg-primary)] animate-in slide-in-from-top duration-500">
+          <div className="flex justify-between items-center mb-16">
+             <div className="bg-[var(--accent)] text-white w-10 h-10 flex items-center justify-center font-black">L</div>
+             <button onClick={() => setMenuOpen(false)}><X size={40} className="text-[var(--text-main)]" /></button>
+          </div>
+          <div className="flex flex-col gap-8 text-5xl font-black tracking-tighter uppercase italic text-[var(--text-main)]">
+            <Link to="/catalog" onClick={() => setMenuOpen(false)}>Store</Link>
+            <Link to="/profile" onClick={() => setMenuOpen(false)}>Library</Link>
+            <Link to="/guide" onClick={() => setMenuOpen(false)}>Workflow</Link>
+          </div>
+        </div>
+      )}
 
       {/* ПЛАТЕЖНОЕ ОКНО */}
       {payModal && (
         <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-[150] flex items-center justify-center p-4">
           <div className="bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-main)] w-full max-w-lg p-8 md:p-16 shadow-2xl relative animate-in zoom-in-95 duration-300 font-sans">
-            {!isPaying && <button onClick={() => setPayModal(false)} className="absolute top-6 right-6 opacity-30 hover:opacity-100 transition-opacity font-bold text-2xl">✕</button>}
+            {!isPaying && <button onClick={() => setPayModal(false)} className="absolute top-6 right-6 opacity-30 hover:opacity-100 transition-opacity font-bold text-2xl text-[var(--text-main)]">✕</button>}
             <div className="space-y-8">
               <div className="text-center space-y-4">
                 <h2 className="text-[10px] font-[1000] uppercase tracking-[0.5em] text-[var(--accent)] flex items-center justify-center gap-3">
