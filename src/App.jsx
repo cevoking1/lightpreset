@@ -225,7 +225,8 @@ export default function App() {
   useEffect(() => { localStorage.setItem('purchased_presets', JSON.stringify(purchasedIds)); }, [purchasedIds]);
   useEffect(() => { setMenuOpen(false); window.scrollTo(0,0); }, [location]);
 
-  const mainPreset = data.find(p => p.version === 'MAIN') || data[0];
+  const mainPresets = data.filter(p => p.version === 'MAIN');
+  const mainPreset = mainPresets.length > 0 ? mainPresets[0] : data[0];
 
   return (
     <div className={`min-h-screen transition-colors ${darkMode ? 'bg-[#050505] text-[#E0E0E0]' : 'bg-[#F9F9F9] text-[#1A1A1A]'}`}>
