@@ -5,7 +5,7 @@
 body {
   margin: 0;
   /* Убираем жесткий белый фон, чтобы при загрузке не было вспышек */
-  background-color: #050505; 
+  background-color: #0F0F0F; 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
