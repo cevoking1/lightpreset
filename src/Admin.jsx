@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
-import { ArrowLeft, Trash2, Plus, Package, UploadCloud, Database, Activity, ShieldCheck, Cpu, Lock, Key, Hash, Star } from 'lucide-react';
+import { ArrowLeft, Trash2, Package, UploadCloud, Database, Activity, ShieldCheck, Cpu, Lock, Key, Hash } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Admin({ darkMode }) {
   // --- АВТОРИЗАЦИЯ ---
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  const ADMIN_PASSWORD = "admin"; 
+  const ADMIN_PASSWORD = "admin"; // Ключ доступа к панели
 
+  // Функция входа в систему
   const handleLogin = (e) => {
     e.preventDefault();
     if (password === ADMIN_PASSWORD) {
@@ -19,9 +20,11 @@ export default function Admin({ darkMode }) {
     }
   };
 
+  // --- СОСТОЯНИЕ ДАННЫХ ---
   const [loading, setLoading] = useState(false);
   const [presets, setPresets] = useState([]);
   
+  // Поля формы создания пресета
   const [form, setForm] = useState({ 
     name: '', 
     price: '', 
@@ -30,45 +33,22 @@ export default function Admin({ darkMode }) {
     version: 'v12.0+' 
   });
   
+  // Выбранные файлы для загрузки
   const [files, setFiles] = useState({ before: null, after: null, zip: null });
 
+  // Загружаем список из базы данных при входе в админку
   useEffect(() => { 
     if (isAuthenticated) fetchPresets(); 
   }, [isAuthenticated]);
 
+  // Функция получения данных из Supabase
   async function fetchPresets() {
     const { data, error } = await supabase.from('presets').select('*').order('id', { ascending: false });
     if (error) console.error("Ошибка загрузки данных:", error);
     else setPresets(data);
   }
 
-  // --- ОБНОВЛЕННАЯ ФУНКЦИЯ: УСТАНОВКА ГЛАВНОГО СЛАЙДЕРА ---
-  const setAsDefault = async (id) => {
-    setLoading(true);
-    try {
-      // 1. Сбрасываем MAIN у всех, кто его имеет
-      await supabase
-        .from('presets')
-        .update({ version: 'v12.0+' })
-        .eq('version', 'MAIN');
-      
-      // 2. Устанавливаем метку "MAIN" выбранному пресету
-      const { error } = await supabase
-        .from('presets')
-        .update({ version: 'MAIN' })
-        .eq('id', id);
-      
-      if (error) throw error;
-      
-      alert("Система: Главный актив синхронизирован.");
-      await fetchPresets(); 
-    } catch (err) {
-      alert("Ошибка: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Вспомогательная функция для отправки файлов в облачное хранилище
   const uploadFile = async (file, folder) => {
     if (!file) return null;
     const fileExt = file.name.split('.').pop();
@@ -82,36 +62,45 @@ export default function Admin({ darkMode }) {
     return data.publicUrl;
   };
 
+  // Обработка отправки формы (Публикация нового пресета)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      if (!files.before || !files.after || !files.zip) throw new Error("Выберите все файлы!");
+      if (!files.before || !files.after || !files.zip) throw new Error("Выберите все необходимые файлы!");
+      
+      // Поочередная загрузка изображений и архива
       const beforeUrl = await uploadFile(files.before, 'previews');
       const afterUrl = await uploadFile(files.after, 'previews');
       const zipUrl = await uploadFile(files.zip, 'archives');
-      const { data, error } = await supabase.from('presets').insert([{
+
+      // Запись данных в таблицу
+      const { error } = await supabase.from('presets').insert([{
         name: form.name, price: form.price, category: form.category,
         format: form.format, version: form.version,
         before_url: beforeUrl, after_url: afterUrl, file_url: zipUrl
-      }]).select();
+      }]);
+
       if (error) throw new Error(`Ошибка БД: ${error.message}`);
-      alert('Актив успешно опубликован!');
-      fetchPresets();
-      e.target.reset();
+      
+      alert('Актив успешно опубликован в системе!');
+      fetchPresets(); // Обновляем список на странице
       setForm({ name: '', price: '', category: 'ПК', format: '.XMP', version: 'v12.0+' });
       setFiles({ before: null, after: null, zip: null });
+      e.target.reset();
     } catch (error) { alert(error.message); } finally { setLoading(false); }
   };
 
+  // Удаление объекта из базы
   const handleDelete = async (id) => {
-    if (window.confirm('Удалить объект ID: ' + id + '?')) {
+    if (window.confirm('Вы уверены, что хотите безвозвратно удалить объект ID: ' + id + '?')) {
       const { error } = await supabase.from('presets').delete().eq('id', id);
       if (error) alert("Ошибка: " + error.message);
       else fetchPresets();
     }
   };
 
+  // --- СТИЛИЗАЦИЯ ---
   const cardBg = darkMode ? 'bg-[#0A0A0A]' : 'bg-white';
   const inputBg = darkMode ? 'bg-[#121212]' : 'bg-gray-100';
   const borderColor = darkMode ? 'border-white/10' : 'border-gray-200';
@@ -123,6 +112,7 @@ export default function Admin({ darkMode }) {
     backgroundSize: '1em'
   };
 
+  // Экран авторизации
   if (!isAuthenticated) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-black text-white' : 'bg-[#f5f5f5] text-black'} font-sans p-6`}>
@@ -130,14 +120,14 @@ export default function Admin({ darkMode }) {
           <div className="text-center space-y-4">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-[#FA0F00]/10 text-[#FA0F00] rounded-full mb-4"><Lock size={32} /></div>
             <h1 className="text-[10px] font-black uppercase tracking-[0.5em] text-[#FA0F00]">Admin Access</h1>
-            <p className="text-[9px] opacity-30 uppercase tracking-widest text-center">Консоль управления активами</p>
+            <p className="text-[9px] opacity-30 uppercase tracking-widest text-center italic">Консоль управления терминалом</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="relative">
               <Key size={16} className="absolute left-4 top-1/2 -translate-y-1/2 opacity-20" />
               <input 
                 type="password" 
-                placeholder="ПАРОЛЬ" 
+                placeholder="ВВЕДИТЕ КЛЮЧ" 
                 className={`w-full ${inputBg} border ${borderColor} p-5 pl-12 text-xs outline-none focus:border-[#FA0F00]/50 tracking-[0.3em] font-mono text-white`}
                 value={password} onChange={(e) => setPassword(e.target.value)} autoFocus required 
               />
@@ -149,11 +139,12 @@ export default function Admin({ darkMode }) {
     );
   }
 
+  // Главный интерфейс Админки
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-black text-[#e0e0e0]' : 'bg-[#f9f9f9] text-[#1a1a1a]'} font-sans p-6 md:p-10 transition-colors duration-500`}>
       <div className="max-w-[1440px] mx-auto space-y-6">
         
-        {/* HEADER TOOLBAR */}
+        {/* ВЕРХНЯЯ ПАНЕЛЬ СТАТУСА */}
         <div className={`flex flex-wrap justify-between items-center px-8 py-5 border rounded-sm ${cardBg} ${borderColor} shadow-sm`}>
           <div className="flex items-center gap-6">
             <Link to="/" className={`p-2 ${inputBg} hover:bg-[#FA0F00] hover:text-white transition-all rounded-sm`}>
@@ -161,7 +152,7 @@ export default function Admin({ darkMode }) {
             </Link>
             <div className="flex items-center gap-4">
               <Cpu size={20} className="text-[#FA0F00]" />
-              <h1 className="text-[11px] font-[1000] uppercase tracking-[0.4em]">System <span className="font-light opacity-30">/ Admin Console</span></h1>
+              <h1 className="text-[11px] font-[1000] uppercase tracking-[0.4em]">Control <span className="font-light opacity-30">/ Panel</span></h1>
             </div>
           </div>
           <div className="flex gap-10 items-center text-[9px] font-bold uppercase opacity-30 tracking-[0.2em]">
@@ -172,69 +163,67 @@ export default function Admin({ darkMode }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* ФОРМА ВВОДА */}
+          {/* СЕКЦИЯ: ФОРМА ДОБАВЛЕНИЯ */}
           <div className={`lg:col-span-4 p-10 border rounded-sm ${cardBg} ${borderColor} space-y-10 shadow-sm`}>
-            <h3 className="text-[10px] font-[1000] uppercase text-[#FA0F00] tracking-[0.4em]">Publish Asset</h3>
+            <h3 className="text-[10px] font-[1000] uppercase text-[#FA0F00] tracking-[0.4em]">Опубликовать актив</h3>
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] ml-1">Asset Name</label>
-                  <input type="text" placeholder="Cinematic Moody..." className={`w-full ${inputBg} border ${borderColor} p-4 text-xs outline-none focus:border-[#FA0F00]/50 uppercase font-bold tracking-tighter`} value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+                  <label className="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] ml-1">Название стиля</label>
+                  <input type="text" placeholder="Введите название..." className={`w-full ${inputBg} border ${borderColor} p-4 text-xs outline-none focus:border-[#FA0F00]/50 uppercase font-bold tracking-tighter`} value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] ml-1">Price (₸)</label>
+                    <label className="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] ml-1">Цена (₸)</label>
                     <input type="text" placeholder="3500" className={`w-full ${inputBg} border ${borderColor} p-4 text-xs outline-none font-mono focus:border-[#FA0F00]/50`} value={form.price} onChange={e => setForm({...form, price: e.target.value})} required />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] ml-1">Platform</label>
+                    <label className="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] ml-1">Платформа</label>
                     <select 
                       style={selectStyle}
                       className={`w-full ${inputBg} border ${borderColor} p-4 text-[10px] font-black uppercase outline-none cursor-pointer appearance-none hover:border-[#FA0F00]/50 transition-all`} 
                       value={form.category} onChange={e => setForm({...form, category: e.target.value})}
                     >
-                      <option value="ПК" className="bg-[#121212]">Desktop</option>
-                      <option value="Мобильные" className="bg-[#121212]">Mobile</option>
+                      <option value="ПК" className="bg-[#121212]">Для ПК</option>
+                      <option value="Мобильные" className="bg-[#121212]">Для Телефона</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-5">
-                  <div className="space-y-2 text-white">
-                    <label className="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] ml-1">File Format</label>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] ml-1">Формат</label>
                     <select 
                       style={selectStyle}
                       className={`w-full ${inputBg} border ${borderColor} p-4 text-[10px] font-black uppercase outline-none cursor-pointer appearance-none hover:border-[#FA0F00]/50 transition-all`}
                       value={form.format} onChange={e => setForm({...form, format: e.target.value})}
                     >
-                      <option value=".XMP" className="bg-[#121212]">.XMP (LRC)</option>
+                      <option value=".XMP" className="bg-[#121212]">.XMP (Lightroom)</option>
                       <option value=".DNG" className="bg-[#121212]">.DNG (Mobile)</option>
-                      <option value=".ZIP" className="bg-[#121212]">.ZIP Bundle</option>
-                      <option value=".CUBE" className="bg-[#121212]">.CUBE LUT</option>
+                      <option value=".ZIP" className="bg-[#121212]">.ZIP Архив</option>
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] ml-1">Compatibility</label>
+                    <label className="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] ml-1">Софт</label>
                     <select 
                       style={selectStyle}
                       className={`w-full ${inputBg} border ${borderColor} p-4 text-[10px] font-black uppercase outline-none cursor-pointer appearance-none hover:border-[#FA0F00]/50 transition-all`}
                       value={form.version} onChange={e => setForm({...form, version: e.target.value})}
                     >
                       <option value="v12.0+" className="bg-[#121212]">v12.0+</option>
-                      <option value="v10.0+" className="bg-[#121212]">v10.0+</option>
-                      <option value="Universal" className="bg-[#121212]">Universal</option>
-                      <option value="Mobile App" className="bg-[#121212]">Mobile App</option>
+                      <option value="Universal" className="bg-[#121212]">Любой</option>
                     </select>
                   </div>
                 </div>
               </div>
 
+              {/* ЗАГРУЗКА ФАЙЛОВ */}
               <div className="space-y-3 pt-6 border-t border-white/5">
                 {['before', 'after', 'zip'].map((key) => (
                   <label key={key} className={`flex items-center justify-between p-4 border border-dashed ${borderColor} cursor-pointer hover:bg-[#FA0F00]/5 transition-all group`}>
                     <span className="text-[9px] font-mono opacity-40 uppercase group-hover:opacity-100 truncate pr-4">
-                      {files[key] ? files[key].name : `Select_${key}_asset`}
+                      {files[key] ? files[key].name : `Выбрать_${key}_файл`}
                     </span>
                     <input type="file" className="hidden" onChange={e => setFiles({...files, [key]: e.target.files[0]})} />
                     <UploadCloud size={14} className="opacity-20 group-hover:text-[#FA0F00] group-hover:opacity-100 transition-all" />
@@ -243,16 +232,16 @@ export default function Admin({ darkMode }) {
               </div>
 
               <button type="submit" disabled={loading} className="w-full py-5 bg-[#FA0F00] text-white font-[1000] uppercase text-[10px] tracking-[0.4em] shadow-xl hover:brightness-110 active:scale-95 disabled:opacity-20 transition-all">
-                {loading ? 'SYNCING...' : 'PUBLISH TO DATABASE'}
+                {loading ? 'ЗАГРУЗКА ДАННЫХ...' : 'ОПУБЛИКОВАТЬ В БАЗУ'}
               </button>
             </form>
           </div>
 
-          {/* ТАБЛИЦА: LIST VIEW */}
+          {/* СЕКЦИЯ: ТАБЛИЦА С ТОВАРАМИ */}
           <div className={`lg:col-span-8 border rounded-sm ${cardBg} ${borderColor} shadow-sm overflow-hidden flex flex-col`}>
-            <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
+            <div className="p-8 border-b border-white/5 bg-white/[0.01]">
                <h3 className="text-[10px] font-[1000] uppercase text-[#FA0F00] tracking-[0.4em] flex items-center gap-3">
-                 <Hash size={14} /> Registry Entries <span className="opacity-20 text-white">[{presets.length}]</span>
+                 <Hash size={14} /> Реестр товаров <span className="opacity-20 text-white">[{presets.length}]</span>
                </h3>
             </div>
             
@@ -260,59 +249,45 @@ export default function Admin({ darkMode }) {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-white/[0.02] border-b border-white/5 text-[9px] font-[1000] uppercase tracking-widest opacity-40">
-                    <th className="p-8">Preview</th>
-                    <th className="p-8">Object Identifier</th>
-                    <th className="p-8">Specifications</th>
-                    <th className="p-8 text-right">Ops</th>
+                    <th className="p-8">Превью</th>
+                    <th className="p-8">Идентификатор</th>
+                    <th className="p-8">Спецификации</th>
+                    <th className="p-8 text-right">Действия</th>
                   </tr>
                 </thead>
                 <tbody className="text-[11px] font-bold">
                   {presets.map(item => (
                     <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
                       <td className="p-8">
-                        <div className="w-14 h-14 border border-white/10 overflow-hidden bg-black relative">
-                          <img src={item.after_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-                          {item.version === 'MAIN' && (
-                            <div className="absolute inset-0 bg-[#FA0F00]/20 flex items-center justify-center">
-                               <Star size={12} className="text-[#FA0F00] fill-[#FA0F00]" />
-                            </div>
-                          )}
+                        <div className="w-14 h-14 border border-white/10 overflow-hidden bg-black">
+                          <img src={item.after_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="" />
                         </div>
                       </td>
                       <td className="p-8">
                         <div className="space-y-1">
-                          <p className="uppercase tracking-tight text-sm">{item.name}</p>
-                          <p className="text-[8px] font-mono opacity-20 italic">ID: {item.id.toString().slice(0,12)}...</p>
+                          <p className="uppercase tracking-tight text-sm font-black">{item.name}</p>
+                          <p className="text-[8px] font-mono opacity-20 italic">DB_ID: {item.id.toString().slice(0,12)}...</p>
                         </div>
                       </td>
                       <td className="p-8">
                         <div className="flex flex-col gap-1.5 text-[10px]">
                           <div className="flex gap-2">
                              <span className="px-2 py-0.5 bg-[#FA0F00] text-white text-[8px] font-black uppercase">{item.category}</span>
-                             <span className="px-2 py-0.5 border border-white/10 text-[8px] font-black uppercase">{item.format}</span>
+                             <span className="px-2 py-0.5 border border-white/10 text-[8px] font-black uppercase opacity-50">{item.format}</span>
                           </div>
-                          <span className="opacity-30 uppercase tracking-widest">{item.version}</span>
                           <span className="font-mono text-white/60">{item.price} ₸</span>
                         </div>
                       </td>
                       <td className="p-8 text-right">
-                        <div className="flex gap-2 justify-end">
-                          <button 
-                            onClick={() => setAsDefault(item.id)}
-                            title="Сделать главным"
-                            className={`p-3 transition-all rounded-sm shadow-inner ${item.version === 'MAIN' ? 'bg-[#FA0F00] text-white' : 'bg-white/5 text-gray-500 hover:text-[#FA0F00]'}`}
-                          >
-                            <Star size={16} className={item.version === 'MAIN' ? 'fill-white' : ''} />
-                          </button>
-                          <button onClick={() => handleDelete(item.id)} className="p-3 bg-white/5 text-gray-500 hover:text-white hover:bg-red-600 transition-all rounded-sm shadow-inner">
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
+                        <button onClick={() => handleDelete(item.id)} className="p-3 bg-white/5 text-gray-500 hover:text-white hover:bg-red-600 transition-all rounded-sm shadow-inner">
+                          <Trash2 size={16} />
+                        </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {presets.length === 0 && <div className="p-20 text-center opacity-10 uppercase font-black tracking-widest italic text-xs">База данных пуста</div>}
             </div>
           </div>
 
